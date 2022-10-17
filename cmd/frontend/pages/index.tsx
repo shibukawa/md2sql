@@ -103,7 +103,6 @@ const Home: NextPage = () => {
         <div className="flex-none">
           <a className="btn btn-square btn-ghost" href="https://github.com/shibukawa/md2sql">
             <Image src={gtihubImage} alt="github"/>
-            {/*<img src={githubLogo} alt="github" />*/}
           </a>
         </div>
       </header>
