@@ -7,7 +7,7 @@
     "dev": "next dev",
     "prebuild": "cd ../wasm && GOOS=js GOARCH=wasm go build -o ../frontend/public/md2sql.wasm",
     "build": "next build",
-    "postbuild": "next export && mv out ../../docs",
+    "postbuild": "next export && mv out ../../docs && touch ../../docs/.nojekyll",
     "start": "next start",
     "lint": "next lint"
   },
