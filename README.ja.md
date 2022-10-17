@@ -1,17 +1,17 @@
 # md2sql
 
-Generate SQL/ERD from Markdown list.
+MarkdownのリストからSQL/ERDを生成します。
 
 ```bash
 $ go install github.com/shibukawa/md2sql...
 ```
 
-## Example
+## サンプル
 
-### Simple Example
+### シンプルなサンプル
 
-* All table should start "table: " prefix.
-* Each column is formatted in "name: type".
+* 全てのテーブルは"table: "プリフィックスを持つリストで表現します。
+* カラムは"名前: 型"の形式で定義します。
 
 ```md
 * table: BasicTable
@@ -23,7 +23,7 @@ $ go install github.com/shibukawa/md2sql...
 $ md2sql -f sql simple.md
 ```
 
-You can get the following SQL:
+次のようなSQLが得られます。
 
 ```sql
 CREATE TABLE BasicTable(
@@ -32,7 +32,7 @@ CREATE TABLE BasicTable(
 );
 ```
 
-Also you can get the PlantUML and Mermaid.js ERD by using `-f plantuml` or `-f mermaid`:
+`-f plantuml`もしくは`-f mermaid`オプションをつけることで、PlantUMLおよびMermaid.js形式のERDが生成できます。
 
 ```plantuml
 @startuml
@@ -55,13 +55,13 @@ BasicTable {
 }
 ```
 
-### Basic Example
+### 基本的なサンプル
 
-You can specify primary key, index and foreign key.
+主キー、インデックス、外部キーも設定できます。
 
-* `##` prefix of name means primary key. If you omit type, it becomes auto incremental field.
-* `#` prefix of name means index.
-* `*` prefix of type field means foreign key.
+* 名前に`##`プリフィックスを付けるとプライマリーキーになります。型を省略するとオートインクリメントのフィールドになります。
+* 名前に`#`プリフィックスを付けるとインデックスを付与します。
+* 型に`*`プリフィックスを付けると外部キーになります。
 
 ```md
 * table: User
@@ -76,7 +76,7 @@ You can specify primary key, index and foreign key.
     * name: string
 ```
 
-You can get the following SQL:
+次のようなSQLが得られます。
 
 ```sql
 CREATE TABLE User(
@@ -98,9 +98,9 @@ CREATE TABLE Job(
 );
 ```
 
-### Associative Entity
+### 連想エンティティ
 
-You can specify [Associative Entity](https://en.wikipedia.org/wiki/Associative_entity) by using `[]` suffix.
+`[]`サフィックスをつけることで[連想エンティティ](https://ja.wikipedia.org/wiki/%E9%80%A3%E6%83%B3%E3%82%A8%E3%83%B3%E3%83%86%E3%82%A3%E3%83%86%E3%82%A3)の指定ができます。
 
 ```
 * table: User
@@ -114,7 +114,7 @@ You can specify [Associative Entity](https://en.wikipedia.org/wiki/Associative_e
     * name: string
 ```
 
-You can get the following SQL:
+次のようなSQLが得られます。
 
 ```sql
 CREATE TABLE User(
@@ -139,6 +139,6 @@ CREATE TABLE User_jobs(
 );
 ```
 
-## License
+## ライセンス
 
 AGPL

@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+cmd/md2sql/md2sql
 
 # Test binary, built with `go test -c`
 *.test
