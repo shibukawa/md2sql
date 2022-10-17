@@ -14,6 +14,7 @@
 
 # production
 /build
+public/md2sql.wasm
 
 # misc
 .DS_Store
