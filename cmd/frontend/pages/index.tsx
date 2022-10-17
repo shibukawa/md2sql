@@ -83,13 +83,13 @@ const Home: NextPage = () => {
       <Head>
         <title>md2sql</title>
         <meta name="description" content="Generate SQL/ERD from Markdown" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/md2sql/favicon.ico" />
       </Head>
       { /* Load web assembly */ }
-      <Script id="exec-wasm" src="/wasm_exec.js" onLoad={() => {
+      <Script id="exec-wasm" src="/md2sql/wasm_exec.js" onLoad={() => {
         // @ts-ignore
         const go = new Go();
-        WebAssembly.instantiateStreaming(fetch("md2sql.wasm"), go.importObject).then((result) => {
+        WebAssembly.instantiateStreaming(fetch("/md2sql/md2sql.wasm"), go.importObject).then((result) => {
           go.run(result.instance);
         });
       }}/>
