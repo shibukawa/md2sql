@@ -7,8 +7,11 @@ import Image from 'next/image'
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {tomorrow} from "react-syntax-highlighter/dist/cjs/styles/hljs";
+import mermaid from "mermaid";
 
 import gtihubImage from "../public/GitHub-Mark-Light-64px.png";
+import { PlantUML } from '../components/plantuml'
+
 
 // import styles from '../styles/Home.module.css'
 
@@ -30,6 +33,7 @@ const Home: NextPage = () => {
   const [format, setFormat] = useState("sql");
   const src = useRef(initialSrc);
   const [result, setResult] = useState("");
+  const [tab, setTab] = useState("preview");
 
   const selectFormat = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setFormat(e.target.value);
@@ -44,6 +48,12 @@ const Home: NextPage = () => {
       generate();
     }
   }, [format]);
+
+  useEffect(() => {
+    if (format === "mermaid" && tab=== "preview" && result !== "") {
+      mermaid.init({noteMargin: 10}, ".mermaid");
+    }
+  }, [format, result, tab])
 
   const generate = useCallback(() => {
     switch (format) {
@@ -128,12 +138,29 @@ const Home: NextPage = () => {
         </div> 
         <div className="divider lg:divider-vertical"></div> 
         <div className="flex flex-grow h-full card rounded-box shadow-2xl p-6">
-          <h2 className="grow-0 font-medium leading-tight text-4xl mt-0 mb-2 text-blue-600">Result</h2>
-          <div className="grow m-2">
-            <SyntaxHighlighter language={format} style={tomorrow} className="h-full">
+          <h2 className="grow-0 font-medium leading-tight text-4xl mt-0 mb-2 text-blue-600">
+            Result
+            { format !== "sql" ?
+            <div className="tabs">
+              <a className={`tab tab-lifted ${tab==="preview" ? "tab-active" : ""}`} onClick={() => { setTab("preview")}}>Preview</a> 
+              <a className={`tab tab-lifted ${tab==="src" ? "tab-active" : ""}`} onClick={() => { setTab("src")}}>Source</a> 
+            </div> : null}
+          </h2>
+
+          { format === "sql" || tab === "src" ? 
+            <div className="grow m-2">
+              <SyntaxHighlighter language={format} style={tomorrow} className="h-full">
+                {result}
+              </SyntaxHighlighter>
+            </div>
+            : format === "mermaid" ?
+            <div className="grow m-2 mermaid" key={`${format}${result}${tab}`}>
               {result}
-            </SyntaxHighlighter>
-          </div>
+            </div>
+            : format === "plantuml" ?
+            <PlantUML src={result} className="grow m-2" key={`${format}${result}${tab}`}/>
+            : null
+          }
           <div className="grow-0 flex w-full">
             <button className="btn m-1" onClick={generate}>Generate</button>
             <button className="btn m-1" disabled={result === ""} onClick={copyToClipboard}>Copy To Clipboard</button>

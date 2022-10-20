@@ -14,13 +14,17 @@
   "dependencies": {
     "@types/react-syntax-highlighter": "^15.5.5",
     "daisyui": "^2.31.0",
+    "mermaid": "^9.1.7",
     "next": "12.3.1",
+    "pako": "^2.0.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-syntax-highlighter": "^15.5.0"
   },
   "devDependencies": {
+    "@types/mermaid": "^9.1.0",
     "@types/node": "18.11.0",
+    "@types/pako": "^2.0.0",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
     "autoprefixer": "^10.4.12",
