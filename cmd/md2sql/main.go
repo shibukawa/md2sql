@@ -26,12 +26,12 @@ var dummy = `
 # title
 
 * table: Person
-	* ##id
+	* @id
 	* name: string
 	* age: integer
 
 * table: work
-	* ##id
+	* @id
 `
 
 func main() {

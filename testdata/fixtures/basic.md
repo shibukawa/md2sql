@@ -1,5 +1,5 @@
 * table: User
-  * ##id
+  * @id
   * name: text
-  * #email: text
+  * $email: text
   * age: int

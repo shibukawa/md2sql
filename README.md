@@ -59,20 +59,20 @@ BasicTable {
 
 You can specify primary key, index and foreign key.
 
-* `##` prefix of name means primary key. If you omit type, it becomes auto incremental field.
-* `#` prefix of name means index.
+* `@` prefix of name means primary key. If you omit type, it becomes auto incremental field.
+* `$` prefix of name means index.
 * `*` prefix of type field means foreign key.
 
 ```md
 * table: User
-    * ##id
+    * @id
     * name: string
-    * #email: string
+    * $email: string
     * age: integer
     * job: *Job.id
 
 * table: Job
-    * ##id
+    * @id
     * name: string
 ```
 
@@ -104,13 +104,13 @@ You can specify [Associative Entity](https://en.wikipedia.org/wiki/Associative_e
 
 ```
 * table: User
-    * ##id
+    * @id
     * name: string
     * age: integer
     * jobs: *Job.id[]
 
 * table: Job
-    * ##id
+    * @id
     * name: string
 ```
 

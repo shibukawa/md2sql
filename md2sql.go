@@ -35,17 +35,14 @@ func ParseColumn(src string) (*Column, error) {
 	if ok {
 		before = strings.TrimSpace(before)
 		after = strings.TrimSpace(after)
-		if strings.HasPrefix(before, "##") {
-			before = strings.TrimPrefix(before, "##")
+		if strings.HasPrefix(before, "@") {
+			before = strings.TrimPrefix(before, "@")
 			result.PrimaryKey = true
-			result.Name = before
-			result.Type = after
-		} else if strings.HasPrefix(before, "#") {
-			before = strings.TrimPrefix(before, "#")
+		} else if strings.HasPrefix(before, "$") {
+			before = strings.TrimPrefix(before, "$")
 			result.Index = true
-			result.Name = before
-			result.Type = after
-		} else if strings.HasPrefix(after, "*") {
+		}
+		if strings.HasPrefix(after, "*") {
 			after = strings.TrimPrefix(after, "*")
 			if strings.HasSuffix(after, "?") {
 				after = strings.TrimSuffix(after, "?")
@@ -58,21 +55,19 @@ func ParseColumn(src string) (*Column, error) {
 			if !ok {
 				return nil, fmt.Errorf("foreign key definition should be 'table.column', but no period found: %s", after)
 			}
-			result.Name = before
 			result.LinkTable = table
 			result.LinkColumn = column
-		} else if strings.HasSuffix(after, "?") {
+			after = ""
+		}
+		if strings.HasSuffix(after, "?") {
 			after = strings.TrimSuffix(after, "?")
 			result.Nullable = true
-			result.Name = before
-			result.Type = after
-		} else {
-			result.Name = before
-			result.Type = after
 		}
+		result.Name = before
+		result.Type = after
 	} else {
-		if strings.HasPrefix(before, "##") {
-			before = strings.TrimPrefix(before, "##")
+		if strings.HasPrefix(before, "@") {
+			before = strings.TrimPrefix(before, "@")
 			result.PrimaryKey = true
 			result.AutoIncrement = true
 			result.Name = before

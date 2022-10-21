@@ -1,10 +1,10 @@
 * table: User
-    * ##id
+    * @id
     * name: string
-    * #email: string
+    * $email: string
     * age: integer
     * job: *Job.id
 
 * table: Job
-    * ##id
+    * @id
     * name: string

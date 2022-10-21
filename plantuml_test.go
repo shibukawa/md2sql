@@ -29,7 +29,7 @@ func TestDumpPlantUML(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * name: text
 				  * age:  int?
 				`),
@@ -51,10 +51,10 @@ func TestDumpPlantUML(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * job: *Job.id
 				* table: Job
-				  * ##id
+				  * @id
 				`),
 			},
 			want: TrimIndent(t, `
@@ -81,10 +81,10 @@ func TestDumpPlantUML(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * job: *Job.id[]
 				* table: Job
-				  * ##id
+				  * @id
 				`),
 			},
 			want: TrimIndent(t, `

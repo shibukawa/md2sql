@@ -29,7 +29,7 @@ func TestDumpMermaid(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * name: text
 				  * age:  int
 				`),
@@ -49,10 +49,10 @@ func TestDumpMermaid(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * job: *Job.id
 				* table: Job
-				  * ##id
+				  * @id
 				`),
 			},
 			want: TrimIndent(t, `
@@ -75,10 +75,10 @@ func TestDumpMermaid(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * job: *Job.id
 				* table: Job
-				  * ##id: string
+				  * @id: string
 				`),
 			},
 			want: TrimIndent(t, `
@@ -101,10 +101,10 @@ func TestDumpMermaid(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * job: *Job.id[]
 				* table: Job
-				  * ##id: string
+				  * @id: string
 				`),
 			},
 			want: TrimIndent(t, `

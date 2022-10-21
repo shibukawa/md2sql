@@ -18,14 +18,14 @@ import { PlantUML } from '../components/plantuml'
 const initialSrc = `# Sample Markdown
 
 * table: User
-    * ##id
+    * @id
     * name: string
-    * #email: string
+    * $email: string
     * age: integer
     * jobs: *Job.id[]
 
 * table: Job
-    * ##id
+    * @id
     * name: string
 `
 

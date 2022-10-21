@@ -29,7 +29,7 @@ func TestSQL(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * name: string
 				  * age:  integer?
 				`),
@@ -47,10 +47,10 @@ func TestSQL(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * job: *Job.id
 				* table: Job
-				  * ##id
+				  * @id
 				`),
 			},
 			want: TrimIndent(t, `
@@ -68,14 +68,58 @@ func TestSQL(t *testing.T) {
 			`),
 		},
 		{
+			name: "two table with primary foreign key",
+			args: args{
+				src: TrimIndent(t, `
+				* table: Users
+				  * @id
+				  * name: string
+				* table: Tasks
+				  * @id: *Users.id
+				`),
+			},
+			want: TrimIndent(t, `
+			CREATE TABLE Users(
+				id SERIAL,
+				name TEXT NOT NULL,
+				PRIMARY KEY(id)
+			);
+
+			CREATE TABLE Tasks(
+				id INTEGER,
+				PRIMARY KEY(id),
+				FOREIGN KEY(id) REFERENCES Users(id)
+			);
+			`),
+		},
+		{
+			name: "table with primary keys",
+			args: args{
+				src: TrimIndent(t, `
+				* table: Logs
+				  * @task:  integer
+				  * @index: integer
+				  * log: string
+				`),
+			},
+			want: TrimIndent(t, `
+			CREATE TABLE Logs(
+				task INTEGER,
+				index INTEGER,
+				log TEXT NOT NULL,
+				PRIMARY KEY(task, index)
+			);
+			`),
+		},
+		{
 			name: "two table with associative entity",
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * jobs: *Job.id[]
 				* table: Job
-				  * ##id
+				  * @id
 				`),
 			},
 			want: TrimIndent(t, `
@@ -103,9 +147,9 @@ func TestSQL(t *testing.T) {
 			args: args{
 				src: TrimIndent(t, `
 				* table: User
-				  * ##id
+				  * @id
 				  * name: string
-				  * #email: string
+				  * $email: string
 				  * age:  integer?
 				`),
 			},

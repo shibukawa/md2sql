@@ -36,7 +36,7 @@ func TestParseColumn(t *testing.T) {
 		{
 			name: "index",
 			args: args{
-				src: "#email: text",
+				src: "$email: text",
 			},
 			want: Column{
 				Name:  "email",
@@ -47,7 +47,7 @@ func TestParseColumn(t *testing.T) {
 		{
 			name: "primary key without type",
 			args: args{
-				src: "##id",
+				src: "@id",
 			},
 			want: Column{
 				Name:          "id",
@@ -58,7 +58,7 @@ func TestParseColumn(t *testing.T) {
 		{
 			name: "primary key with type",
 			args: args{
-				src: "##email: varchar(30)",
+				src: "@email: varchar(30)",
 			},
 			want: Column{
 				Name:       "email",
@@ -117,6 +117,18 @@ func TestParseColumn(t *testing.T) {
 				LinkTable:         "job",
 				LinkColumn:        "id",
 				AssociativeEntity: true,
+			},
+		},
+		{
+			name: "primary foreign key",
+			args: args{
+				src: "@id: *job.id",
+			},
+			want: Column{
+				Name:       "id",
+				PrimaryKey: true,
+				LinkTable:  "job",
+				LinkColumn: "id",
 			},
 		},
 	}
