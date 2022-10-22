@@ -4,6 +4,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Script from 'next/script'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {tomorrow} from "react-syntax-highlighter/dist/cjs/styles/hljs";
@@ -11,11 +12,10 @@ import mermaid from "mermaid";
 
 import gtihubImage from "../public/GitHub-Mark-Light-64px.png";
 import { PlantUML } from '../components/plantuml'
+import { decode62, encode62 } from '../lib/base62'
+import { Mermaid } from '../components/mermaid'
 
-
-// import styles from '../styles/Home.module.css'
-
-const initialSrc = `# Sample Markdown
+const defaultSrc = `# Sample Markdown
 
 * table: User
     * @id
@@ -30,58 +30,62 @@ const initialSrc = `# Sample Markdown
 `
 
 const Home: NextPage = () => {
-  const [format, setFormat] = useState("sql");
-  const src = useRef(initialSrc);
-  const [result, setResult] = useState("");
-  const [tab, setTab] = useState("preview");
+  const router = useRouter();
 
-  const selectFormat = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const [format, setFormat] = useState("sql");
+  const [initialSrc, setInitialSrc] = useState(""); // init after loading in browser
+  const [tab, setTab] = useState("preview");
+  const src = useRef("");                           // textarea is uncontrolled form. this keeps the value
+  const [result, setResult] = useState("");
+
+  useEffect(function initializeStatusFromQueryParameter() {
+    setFormat(router.query["f"] as string || "sql");
+    src.current = router.query["s"] ? decode62(router.query["s"] as string) : defaultSrc;
+    setInitialSrc(src.current);
+    setTab(router.query["t"] as string || "preview");
+  }, [router.isReady])
+
+  const selectFormat = useCallback(function selectFormat(e: React.ChangeEvent<HTMLInputElement>) {
     setFormat(e.target.value);
   }, [])
 
-  const modifySrc = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const modifySrc = useCallback(function modifySrcWhenEdit(e: React.ChangeEvent<HTMLTextAreaElement>) {
     src.current = e.target.value;
   }, [])
 
-  useEffect(() => {
+  useEffect(function regenerateWhenFormatIsChanged(){
     if (result !== "") {
       generate();
     }
   }, [format]);
 
-  useEffect(() => {
-    if (format === "mermaid" && tab=== "preview" && result !== "") {
-      mermaid.init({noteMargin: 10}, ".mermaid");
-    }
-  }, [format, result, tab])
-
   const generate = useCallback(() => {
+    let result;
     switch (format) {
       case "sql":
-        const r1 = md2sql.toSQL(src.current);
-        if (r1.ok) {
-          setResult(r1.result);
-        } else {
-          console.error(r1.message);
-        }
+        result = md2sql.toSQL(src.current);
         break;
       case "plantuml":
-        const r2 = md2sql.toPlantUML(src.current);
-        if (r2.ok) {
-          setResult(r2.result);
-        } else {
-          console.error(r2.message);
-        }
+        result = md2sql.toPlantUML(src.current);
         break;
-      case "mermaid":
-        const r3 = md2sql.toMermaid(src.current);
-        if (r3.ok) {
-          setResult(r3.result);
-        } else {
-          console.error(r3.message);
-        }
+      default: //"mermaid":
+        result = md2sql.toMermaid(src.current);
         break;
     }
+    if (result.ok) {
+      setResult(result.result);
+      router.replace({
+        query: {
+          f: format,
+          s: encode62(src.current),
+          t: tab,
+        },        
+      }, undefined, { shallow: true});
+      } else {
+      console.error(result.message);
+    }
+
+
   }, [format])
 
   const copyToClipboard = useCallback(() => {
@@ -120,7 +124,10 @@ const Home: NextPage = () => {
       <main className="main flex flex-col w-full grow lg:flex-row items-stretch">
         <div className="flex flex-grow h-full card rounded-box shadow-2xl p-6">
           <h2 className="grow-0 font-medium leading-tight text-4xl mt-0 mb-2 text-blue-600">Markdown Source</h2>
-          <textarea className="m-6 p-1 textarea textarea-bordered grow h-full" onInput={modifySrc} defaultValue={initialSrc}></textarea>
+          { initialSrc
+             ? <textarea className="m-6 p-1 textarea textarea-bordered grow h-full" onInput={modifySrc} defaultValue={initialSrc}></textarea>
+             : <textarea className="m-6 p-1 textarea textarea-bordered grow h-full"></textarea>
+          }
           <div className="flex">
             <label className="mx-2 label cursor-pointer">
               <span className="label-text">SQL</span> 
@@ -154,11 +161,9 @@ const Home: NextPage = () => {
               </SyntaxHighlighter>
             </div>
             : format === "mermaid" ?
-            <div className="grow m-2 mermaid" key={`${format}${result}${tab}`}>
-              {result}
-            </div>
+            <Mermaid className="grow m-2" src={result} />
             : format === "plantuml" ?
-            <PlantUML src={result} className="grow m-2" key={`${format}${result}${tab}`}/>
+            <PlantUML src={result} className="grow m-2" key={`${format}${result}${tab}`} />
             : null
           }
           <div className="grow-0 flex w-full">

@@ -1,10 +1,10 @@
-import { useMemo, forwardRef } from "react"; 
+import { useMemo } from "react";
 import pako from "pako";
 import { encode64 } from "../lib/encode64"
 
 type ImageProps = JSX.IntrinsicElements['img'];
 
-export const PlantUML = forwardRef<HTMLImageElement, ImageProps>(function PlantUML(plops, ref) {
+export function PlantUML(plops: ImageProps) {
     const { src, ...remained } = plops;
 
     const base64 = useMemo(() => {
@@ -27,6 +27,6 @@ export const PlantUML = forwardRef<HTMLImageElement, ImageProps>(function PlantU
     }, [src])
     console.log({base64})
     
-    return src ? <img {...remained} ref={ref} src={`http://www.plantuml.com/plantuml/svg/${base64}`} /> : null;
-});
+    return src ? <img {...remained} src={`http://www.plantuml.com/plantuml/svg/${base64}`} /> : null;
+};
 
