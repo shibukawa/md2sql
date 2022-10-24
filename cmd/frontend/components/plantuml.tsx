@@ -4,6 +4,8 @@ import { encode64 } from "../lib/encode64"
 
 type ImageProps = JSX.IntrinsicElements['img'];
 
+const encoder = new TextEncoder();
+
 export function PlantUML(plops: ImageProps) {
     const { src, ...remained } = plops;
 
@@ -11,7 +13,7 @@ export function PlantUML(plops: ImageProps) {
         if (!src) {
             return "";
         }
-        const bin = pako.deflateRaw(unescape(encodeURIComponent(src)));
+        const bin = pako.deflateRaw(encoder.encode(src));
         // https://stackoverflow.com/a/21214792
         const CHUNK_SIZE = 0x8000;
         let index = 0;
@@ -25,7 +27,6 @@ export function PlantUML(plops: ImageProps) {
         }
         return encode64(strs.join(''));
     }, [src])
-    console.log({base64})
     
     return src ? <img {...remained} src={`http://www.plantuml.com/plantuml/svg/${base64}`} /> : null;
 };
