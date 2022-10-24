@@ -7,10 +7,12 @@ import (
 )
 
 func DumpSQL(w io.Writer, tables []*Table, d Dialect) error {
-	_, err := fixRelations(tables, d)
+	rels, err := fixRelations(tables, d)
 	if err != nil {
 		return err
 	}
+
+	fmt.Fprintf(w, d.EnableForeignKey(len(rels) > 0))
 
 	// table definition
 	for i, t := range tables {

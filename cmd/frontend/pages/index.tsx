@@ -8,7 +8,6 @@ import { useRouter } from 'next/router'
 
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {tomorrow} from "react-syntax-highlighter/dist/cjs/styles/hljs";
-import mermaid from "mermaid";
 
 import gtihubImage from "../public/GitHub-Mark-Light-64px.png";
 import { PlantUML } from '../components/plantuml'
@@ -27,14 +26,24 @@ const defaultSrc = `# Sample Markdown
 * table: Job
     * @id
     * name: string
-`
+`;
+
+function useSelect(defaultValue: string): [string, (e: React.ChangeEvent<HTMLSelectElement>)=>void, (v: string)=>void] {
+  const [value, setValue] = useState(defaultValue);
+  const onSelect = useCallback(function selectFormat(e: React.ChangeEvent<HTMLSelectElement>) {
+    setValue(e.target.value);
+  }, [])
+  return [value, onSelect, setValue];
+}
 
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const [format, setFormat] = useState("sql");
+  const [format, onSelectFormat, setFormat] = useSelect("sql");
+  const [dialect, onSelectDialect, setDialect] = useSelect("postgres");
   const [initialSrc, setInitialSrc] = useState(""); // init after loading in browser
   const [tab, setTab] = useState("preview");
+
   const src = useRef("");                           // textarea is uncontrolled form. this keeps the value
   const [result, setResult] = useState("");
 
@@ -43,11 +52,8 @@ const Home: NextPage = () => {
     src.current = router.query["s"] ? decode62(router.query["s"] as string) : defaultSrc;
     setInitialSrc(src.current);
     setTab(router.query["t"] as string || "preview");
+    setDialect(router.query["d"] as string || "postgres")
   }, [router.isReady])
-
-  const selectFormat = useCallback(function selectFormat(e: React.ChangeEvent<HTMLInputElement>) {
-    setFormat(e.target.value);
-  }, [])
 
   const modifySrc = useCallback(function modifySrcWhenEdit(e: React.ChangeEvent<HTMLTextAreaElement>) {
     src.current = e.target.value;
@@ -63,7 +69,7 @@ const Home: NextPage = () => {
     let result;
     switch (format) {
       case "sql":
-        result = md2sql.toSQL(src.current);
+        result = md2sql.toSQL(src.current, dialect);
         break;
       case "plantuml":
         result = md2sql.toPlantUML(src.current);
@@ -79,14 +85,13 @@ const Home: NextPage = () => {
           f: format,
           s: encode62(src.current),
           t: tab,
+          d: dialect,
         },        
       }, undefined, { shallow: true});
       } else {
       console.error(result.message);
     }
-
-
-  }, [format])
+  }, [format, dialect])
 
   const copyToClipboard = useCallback(() => {
     navigator.clipboard.writeText(result);
@@ -129,18 +134,30 @@ const Home: NextPage = () => {
              : <textarea className="m-6 p-1 textarea textarea-bordered grow h-full"></textarea>
           }
           <div className="flex">
-            <label className="mx-2 label cursor-pointer">
-              <span className="label-text">SQL</span> 
-              <input type="radio" name="radio-6" className="mx-1 radio checked:bg-blue-500" onChange={selectFormat} value="sql" checked={format=="sql"}/>
-            </label>
-            <label className="mx-2 label cursor-pointer">
-              <span className="label-text">Mermaid.js</span> 
-              <input type="radio" name="radio-6" className="mx-1 radio checked:bg-blue-500" onChange={selectFormat} value="mermaid" checked={format=="mermaid"}/>
-            </label>
-            <label className="mx-2 label cursor-pointer">
-              <span className="label-text">PlantUML</span> 
-              <input type="radio" name="radio-6" className="mx-1 radio checked:bg-blue-500" onChange={selectFormat} value="plantuml" checked={format=="plantuml"}/>
-            </label>
+            <div className="form-control mx-1">
+              <label className="label">
+                <span className="label-text">Export Format</span>
+              </label>
+              <select className="select select-bordered" value={format} onChange={onSelectFormat}>
+                <option value="sql">SQL</option>
+                <option value="mermaid">Mermaid.js</option>
+                <option value="plantuml">PlantUML</option>
+              </select>
+            </div>
+            {
+              format === "sql" ? 
+                <div className="form-control mx-1">
+                  <label className="label">
+                    <span className="label-text">Dialect</span>
+                  </label>
+                  <select className="select select-bordered" value={dialect} onChange={onSelectDialect}>
+                    <option value="postgres">PostgreSQL</option>
+                    <option value="mysql">MySQL</option>
+                    <option value="sqlite">SQLite</option>
+                  </select>
+                </div>
+              : null
+            }
           </div>
         </div> 
         <div className="divider lg:divider-vertical"></div> 
@@ -156,7 +173,7 @@ const Home: NextPage = () => {
 
           { format === "sql" || tab === "src" ? 
             <div className="grow m-2">
-              <SyntaxHighlighter language={format} style={tomorrow} className="h-full">
+              <SyntaxHighlighter language={format} style={tomorrow} className="h-full rounded-md border border-slate-300 text-xs">
                 {result}
               </SyntaxHighlighter>
             </div>

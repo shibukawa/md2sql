@@ -52,6 +52,13 @@ func (d Dialect) PrimaryKeySQLType(t string, autoIncrement bool) string {
 	return d.TypeConversion(t)
 }
 
+func (d Dialect) EnableForeignKey(hasForeignKey bool) string {
+	if d == SQLite && hasForeignKey {
+		return "PRAGMA foreign_keys = ON;\n\n"
+	}
+	return ""
+}
+
 func (d Dialect) PrimaryKeyBaseType(t string) string {
 	if t == "" {
 		switch d {

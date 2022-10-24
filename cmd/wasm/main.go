@@ -17,6 +17,10 @@ func ConvertToSQL(this js.Value, args []js.Value) any {
 			"message": "first argument should be markdown source.",
 		}
 	}
+	dialect := "postgres"
+	if len(args) == 2 {
+		dialect = args[1].String()
+	}
 	tables, err := md2sql.Parse(strings.NewReader(args[0].String()))
 	if err != nil {
 		return map[string]any{
@@ -25,7 +29,7 @@ func ConvertToSQL(this js.Value, args []js.Value) any {
 		}
 	}
 	var buf bytes.Buffer
-	md2sql.DumpSQL(&buf, tables, md2sql.PostgreSQL)
+	md2sql.DumpSQL(&buf, tables, md2sql.ToDialect(dialect))
 	return map[string]any{
 		"ok":     true,
 		"result": buf.String(),
