@@ -17,7 +17,7 @@ func init() {
 
 var (
 	dialect = kingpin.Flag("dialect", "SQL dialect").Short('d').Default("postgres").Enum("postgres", "mysql", "sqlite")
-	format  = kingpin.Flag("format", "Output format").Short('f').Default("sql").Enum("sql", "mermaid", "plantuml")
+	format  = kingpin.Flag("format", "Output format").Short('f').Default("sql").Enum("sql", "mermaid", "plantuml", "graphviz", "dot")
 	output  = kingpin.Flag("output", "Output file").Short('o').File()
 	source  = kingpin.Arg("src", "source file").ExistingFile()
 )
@@ -69,5 +69,9 @@ func main() {
 		md2sql.DumpMermaid(*output, tables, d)
 	case "plantuml":
 		md2sql.DumpPlantUML(*output, tables, d)
+	case "graphviz":
+		fallthrough
+	case "dot":
+		md2sql.DumpGraphviz(*output, tables, md2sql.PhysicalModel, d)
 	}
 }

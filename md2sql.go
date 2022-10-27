@@ -26,7 +26,6 @@ type Column struct {
 	Nullable             bool
 	AssociativeEntity    bool
 	ForeignKeyConstraint bool
-	GlobalIndex          int
 }
 
 func ParseColumn(src string) (*Column, error) {
@@ -125,10 +124,8 @@ const (
 
 type Relation struct {
 	FromTable       string
-	FromColumnIndex int
 	FromCardinality Cardinality
 	ToTable         string
-	ToColumnIndex   int
 	ToCardinality   Cardinality
 	Label           string
 }
@@ -140,13 +137,10 @@ func fixRelations(tables []*Table, d Dialect) ([]*Relation, error) {
 	key := func(table, column string) string {
 		return table + "/**/" + column
 	}
-	globalIndex := 1
 	for _, t := range tables {
 		tmap[t.Name] = t
 		for _, c := range t.Columns {
 			cmap[key(t.Name, c.Name)] = c
-			c.GlobalIndex = globalIndex
-			globalIndex++
 		}
 	}
 
@@ -157,14 +151,12 @@ func fixRelations(tables []*Table, d Dialect) ([]*Relation, error) {
 			if c.LinkTable != "" {
 				rel := &Relation{
 					FromTable:       t.Name,
-					FromColumnIndex: c.GlobalIndex,
 					FromCardinality: ZeroOrMore,
 					ToTable:         c.LinkTable,
 					Label:           c.Name,
 				}
 				if tc, ok := cmap[key(c.LinkTable, c.LinkColumn)]; ok {
 					c.Type = d.PrimaryKeyBaseType(tc.Type)
-					rel.ToColumnIndex = tc.GlobalIndex
 				} else {
 					c.Type = "INTEGER" // fill dummy
 				}

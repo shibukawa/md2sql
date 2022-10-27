@@ -80,6 +80,28 @@ func ConvertToPlantUML(this js.Value, args []js.Value) any {
 	}
 }
 
+func ConvertToGraphviz(this js.Value, args []js.Value) any {
+	if len(args) < 1 {
+		return map[string]any{
+			"ok":      false,
+			"message": "first argument should be markdown source.",
+		}
+	}
+	tables, err := md2sql.Parse(strings.NewReader(args[0].String()))
+	if err != nil {
+		return map[string]any{
+			"ok":      false,
+			"message": err.Error(),
+		}
+	}
+	var buf bytes.Buffer
+	md2sql.DumpGraphviz(&buf, tables, md2sql.PhysicalModel, md2sql.PostgreSQL)
+	return map[string]any{
+		"ok":     true,
+		"result": buf.String(),
+	}
+}
+
 func main() {
 	c := make(chan struct{})
 	js.Global().Set("md2sql", js.ValueOf(map[string]any{
