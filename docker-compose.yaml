@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - pg-store:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pgpassword
+  mariadb:
+    image: mariadb:10.5
+    volumes:
+      - md-store:/var/lib/mysql
+    ports:
+        - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mdpassword
+  plantuml:
+    image: plantuml/plantuml-server:jetty
+    ports:
+      - 18080:8080
+    restart: always
+volumes:
+  pg-store:
+  md-store:
