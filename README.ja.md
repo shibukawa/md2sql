@@ -139,6 +139,36 @@ CREATE TABLE User_jobs(
 );
 ```
 
+### ステレオタイプ
+
+PlantUMLコード生成ではテーブルのステレオタイプが表現できます。7種類のステレオタイプがあります。
+
+| ラベル                    | 意味                                   | マーク |
+| ------------------------- | -------------------------------------- | ------ |
+| `table:`                  | 汎用テーブル                           | **E**  |
+| `master:`                 | システムを表すテーブル                 | **M**  |
+| `tran:` or `transaction:` | アクティビティを表すテーブル           | **T**  |
+| `summary:`                | クエリーのキャッシュを保持するテーブル | **E**  |
+| `work:`                   | 一時テーブル                           | **W**  |
+| `view:`                   | ビュー                                 | **V**  |
+| `associativeentity:`      | 連想エンティティ                       | **A**  |
+
+
+`-`(マイナス) か `_`(アンダースコア)を先頭につけると、従属テーブルを表します。
+
+```md
+* master: Users
+    * @id
+    * name: string
+    * age: integer
+    * jobs: *Job.id[]
+
+* -tran: Tests
+    * @user: Users.id
+    * @date: Date
+    * score: integer
+```
+
 ## ライセンス
 
 AGPL

@@ -10,9 +10,36 @@ import (
 	"github.com/yuin/goldmark/text"
 )
 
+type TableType int
+
+const (
+	EntityTable TableType = iota
+	MasterTable
+	TransactionTable
+	WorkTable
+	SummaryTable
+	View
+	AssociativeEntity
+)
+
+var label2tableType = map[string]TableType{
+	"table":             EntityTable,
+	"master":            MasterTable,
+	"mastertable":       MasterTable,
+	"tran":              TransactionTable,
+	"transaction":       TransactionTable,
+	"transactiontable":  TransactionTable,
+	"work":              WorkTable,
+	"summary":           SummaryTable,
+	"view":              View,
+	"associativeentity": AssociativeEntity,
+}
+
 type Table struct {
-	Name    string
-	Columns []*Column
+	Type        TableType
+	Independent bool
+	Name        string
+	Columns     []*Column
 }
 
 type Column struct {
@@ -88,21 +115,30 @@ func Parse(r io.Reader) ([]*Table, error) {
 		if n.Kind() == ast.KindListItem && entering {
 			if n.ChildCount() == 2 && n.LastChild().Kind() == ast.KindList { // nested
 				label := string(n.FirstChild().Text(b))
-				if strings.HasPrefix(label, "table:") {
-					var columns []*Column
-					c := n.LastChild().FirstChild()
-					for c != nil {
-						column, err := ParseColumn(string(c.FirstChild().Text(b)))
-						if err != nil {
-							return ast.WalkStop, err
-						}
-						columns = append(columns, column)
-						c = c.NextSibling()
+				if t, name, ok := strings.Cut(label, ":"); ok {
+					independent := true
+					if strings.HasPrefix(t, "_") || strings.HasPrefix(t, "-") {
+						t = strings.TrimLeft(t, "_-")
+						independent = false
 					}
-					tables = append(tables, &Table{
-						Name:    strings.TrimSpace(strings.TrimPrefix(label, "table:")),
-						Columns: columns,
-					})
+					if tt, ok := label2tableType[strings.ToLower(t)]; ok {
+						var columns []*Column
+						c := n.LastChild().FirstChild()
+						for c != nil {
+							column, err := ParseColumn(string(c.FirstChild().Text(b)))
+							if err != nil {
+								return ast.WalkStop, err
+							}
+							columns = append(columns, column)
+							c = c.NextSibling()
+						}
+						tables = append(tables, &Table{
+							Type:        tt,
+							Independent: independent,
+							Name:        strings.TrimSpace(name),
+							Columns:     columns,
+						})
+					}
 				}
 			}
 		}

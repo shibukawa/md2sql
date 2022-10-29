@@ -16,16 +16,26 @@ import { Mermaid } from '../components/mermaid'
 
 const defaultSrc = `# Sample Markdown
 
-* table: User
+* master: Users
     * @id
     * name: string
     * $email: string
     * age: integer
-    * jobs: *Job.id[]
 
-* table: Job
+* master: Jobs
     * @id
     * name: string
+
+* tran: Tasks
+    * @id
+    * user: *Users.id
+    * job: *Jobs.id
+    * date: Date
+
+* -tran: Memo
+    * @task: *Tasks.id
+    * @index
+    * memo: string
 `;
 
 function useSelect(defaultValue: string): [string, (e: React.ChangeEvent<HTMLSelectElement>)=>void, (v: string)=>void] {

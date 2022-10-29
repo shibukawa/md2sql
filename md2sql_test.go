@@ -166,7 +166,9 @@ func TestParse(t *testing.T) {
 			},
 			want: []*Table{
 				{
-					Name: "User",
+					Name:        "User",
+					Type:        EntityTable,
+					Independent: true,
 					Columns: []*Column{
 						{
 							Name: "name",
@@ -193,7 +195,9 @@ func TestParse(t *testing.T) {
 			},
 			want: []*Table{
 				{
-					Name: "User",
+					Name:        "User",
+					Type:        EntityTable,
+					Independent: true,
 					Columns: []*Column{
 						{
 							Name: "name",
@@ -206,11 +210,82 @@ func TestParse(t *testing.T) {
 					},
 				},
 				{
-					Name: "Job",
+					Name:        "Job",
+					Type:        EntityTable,
+					Independent: true,
 					Columns: []*Column{
 						{
 							Name: "name",
 							Type: "text",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "master table",
+			args: args{
+				src: TrimIndent(t, `
+				* master: User
+				  * @id: id
+				`),
+			},
+			want: []*Table{
+				{
+					Name:        "User",
+					Type:        MasterTable,
+					Independent: true,
+					Columns: []*Column{
+						{
+							Name:       "id",
+							Type:       "id",
+							PrimaryKey: true,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "dependent master table",
+			args: args{
+				src: TrimIndent(t, `
+					* -master: User
+					  * @id: id
+					`),
+			},
+			want: []*Table{
+				{
+					Name:        "User",
+					Type:        MasterTable,
+					Independent: false,
+					Columns: []*Column{
+						{
+							Name:       "id",
+							Type:       "id",
+							PrimaryKey: true,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "transaction table",
+			args: args{
+				src: TrimIndent(t, `
+					* tran: User
+					  * @id: id
+					`),
+			},
+			want: []*Table{
+				{
+					Name:        "User",
+					Type:        TransactionTable,
+					Independent: true,
+					Columns: []*Column{
+						{
+							Name:       "id",
+							Type:       "id",
+							PrimaryKey: true,
 						},
 					},
 				},

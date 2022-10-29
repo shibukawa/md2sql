@@ -28,7 +28,7 @@ func TestDumpPlantUML(t *testing.T) {
 			name: "single table",
 			args: args{
 				src: TrimIndent(t, `
-				* table: User
+				* table: Users
 				  * @id
 				  * name: text
 				  * age:  int?
@@ -37,8 +37,8 @@ func TestDumpPlantUML(t *testing.T) {
 			want: TrimIndent(t, `
 			@startuml
 
-			entity User {
-			  *id:INTEGER <<generated>>
+			entity table0 as "Users" <<E,ENTITY_MARK_COLOR>> ENTITY {
+			  *id:INTEGER <<PK>>
 			  --
 			  *name:TEXT
 			  age:INT
@@ -50,28 +50,28 @@ func TestDumpPlantUML(t *testing.T) {
 			name: "two table with foreign key",
 			args: args{
 				src: TrimIndent(t, `
-				* table: User
+				* table: Users
 				  * @id
-				  * job: *Job.id
-				* table: Job
+				  * job: *Jobs.id
+				* table: Jobs
 				  * @id
 				`),
 			},
 			want: TrimIndent(t, `
 			@startuml
 
-			entity User {
-			  *id:INTEGER <<generated>>
+			entity table0 as "Users" <<E,ENTITY_MARK_COLOR>> ENTITY {
+			  *id:INTEGER <<PK>>
 			  --
 			  *job:INTEGER <<FK>>
 			}
 
-			entity Job {
-			  *id:INTEGER <<generated>>
+			entity table1 as "Jobs" <<E,ENTITY_MARK_COLOR>> ENTITY {
+			  *id:INTEGER <<PK>>
 			  --
 			}
 
-			User }o--|| Job
+			table0 }o--|| table1
 
 			@enduml
 			`),
@@ -80,27 +80,27 @@ func TestDumpPlantUML(t *testing.T) {
 			name: "two table with associative entity",
 			args: args{
 				src: TrimIndent(t, `
-				* table: User
+				* table: Users
 				  * @id
-				  * job: *Job.id[]
-				* table: Job
+				  * job: *Jobs.id[]
+				* table: Jobs
 				  * @id
 				`),
 			},
 			want: TrimIndent(t, `
 			@startuml
 
-			entity User {
-			  *id:INTEGER <<generated>>
+			entity table0 as "Users" <<E,ENTITY_MARK_COLOR>> ENTITY {
+			  *id:INTEGER <<PK>>
 			  --
 			}
 
-			entity Job {
-			  *id:INTEGER <<generated>>
+			entity table1 as "Jobs" <<E,ENTITY_MARK_COLOR>> ENTITY {
+			  *id:INTEGER <<PK>>
 			  --
 			}
 
-			User }o--o{ Job
+			table0 }o--o{ table1
 
 			@enduml
 			`),
@@ -115,7 +115,10 @@ func TestDumpPlantUML(t *testing.T) {
 				return
 			}
 			DumpPlantUML(w, tables, PostgreSQL)
-			assert.Equal(t, tt.want, w.String())
+			src := w.String()
+			assert.True(t, strings.Contains(src, plantTheme))
+			src = strings.ReplaceAll(src, plantTheme+"\n", "")
+			assert.Equal(t, tt.want, src)
 		})
 	}
 }

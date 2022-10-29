@@ -139,6 +139,35 @@ CREATE TABLE User_jobs(
 );
 ```
 
+### Stereotype
+
+PlantUML generator can represent stereotypes of tables. There are 7 types you can use:
+
+label   meaning Mark
+`table:`   Generic table. **E**
+`master:`   Its represents system. **M**
+`tran:` or `transaction:` It represents activity.   **T**
+`summary:`   It keeps cache of query result.  **E**
+`work:`   Temporary table **W**
+`view:`   View **V**
+`associativeentity:` Associative Entity
+
+And tables that has `-`(minus) or `_`(underscore) prefixed means dependent tables.
+
+```md
+* master: Users
+    * @id
+    * name: string
+    * age: integer
+    * jobs: *Job.id[]
+
+* -tran: Tests
+    * @user: Users.id
+    * @date: Date
+    * score: integer
+```
+
+
 ## License
 
 AGPL
