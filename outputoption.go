@@ -93,3 +93,25 @@ func (d Dialect) TypeConversion(t string) string {
 	}
 	return strings.ToUpper(t)
 }
+
+type Filter int
+
+const (
+	OutputFields Filter = 1 << iota
+	OutputKeys
+	OutputForeignKeyDef
+	OutputMaster
+	OutputTransaction
+	OutputWork
+	OutputSummary
+	OutputView
+	OutputAE
+
+	OutputAllTable = OutputMaster | OutputTransaction | OutputWork | OutputSummary | OutputView | OutputAE
+
+	OutputSkeltonModel  = OutputMaster | OutputTransaction | OutputAE
+	OutputBirdViewModel = OutputMaster | OutputTransaction | OutputAE | OutputKeys
+
+	OutputAll              = OutputExceptForeignKey | OutputForeignKeyDef
+	OutputExceptForeignKey = OutputFields | OutputKeys | OutputAllTable
+)
