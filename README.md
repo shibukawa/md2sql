@@ -6,6 +6,8 @@ Generate SQL/ERD from Markdown list.
 $ go install github.com/shibukawa/md2sql...
 ```
 
+You can try [on your browser](https://shibukawa.github.io/md2sql/).
+
 ## Example
 
 ### Simple Example
@@ -143,14 +145,15 @@ CREATE TABLE User_jobs(
 
 PlantUML generator can represent stereotypes of tables. There are 7 types you can use:
 
-label   meaning Mark
-`table:`   Generic table. **E**
-`master:`   Its represents system. **M**
-`tran:` or `transaction:` It represents activity.   **T**
-`summary:`   It keeps cache of query result.  **E**
-`work:`   Temporary table **W**
-`view:`   View **V**
-`associativeentity:` Associative Entity
+| label                     | meaning                         | Mark  |
+| ------------------------- | ------------------------------- | ----- |
+| `table:`                  | Generic table.                  | **E** |
+| `master:`                 | Its represents system.          | **M** |
+| `tran:` or `transaction:` | It represents activity.         | **T** |
+| `summary:`                | It keeps cache of query result. | **E** |
+| `work:`                   | Temporary table                 | **W** |
+| `view:`                   | View                            | **V** |
+| `associativeentity:`      | Associative Entity              | **A** |
 
 And tables that has `-`(minus) or `_`(underscore) prefixed means dependent tables.
 
@@ -167,6 +170,22 @@ And tables that has `-`(minus) or `_`(underscore) prefixed means dependent table
     * score: integer
 ```
 
+## Web Interface
+
+This tool also provides a [web interface](https://shibukawa.github.io/md2sql/).
+
+```sh
+$ cd cmd/frontend
+$ npm run dev
+```
+
+It uses plantuml.com to generate image from PlantUML source. You can run plantuml server locally by using docker:
+
+```sh
+$ docker compose up -d
+$ cd cmd/frontend
+$ NEXT_PUBLIC_PLANTUML_SERVER=http://localhost:18080 npm run dev
+```
 
 ## License
 
