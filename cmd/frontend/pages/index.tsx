@@ -181,6 +181,11 @@ const Home: NextPage = () => {
             </div> : null}
           </h2>
 
+          <div className="grow-0 flex w-full">
+            <button className="btn m-1" onClick={generate}>Generate</button>
+            <button className="btn m-1" disabled={result === ""} onClick={copyToClipboard}>Copy To Clipboard</button>
+          </div>
+
           { format === "sql" || tab === "src" ? 
             <div className="grow m-2">
               <SyntaxHighlighter language={format} style={tomorrow} className="h-full rounded-md border border-slate-300 text-xs">
@@ -193,10 +198,6 @@ const Home: NextPage = () => {
             <PlantUML src={result} className="grow m-2" key={`${format}${result}${tab}`} />
             : null
           }
-          <div className="grow-0 flex w-full">
-            <button className="btn m-1" onClick={generate}>Generate</button>
-            <button className="btn m-1" disabled={result === ""} onClick={copyToClipboard}>Copy To Clipboard</button>
-          </div>
         </div>
       </main>
     </div>
