@@ -34,6 +34,10 @@ export function PlantUML(plops: ImageProps) {
         return encode64(strs.join(''));
     }, [src])
     
-    return src ? <img {...remained} src={`${serverUrl}/svg/${base64}`} /> : null;
+    return src ? (
+        <span style={{display: "inline-block"}}>
+            <img style={{width:"50%"}} alt={src} {...remained} src={`${serverUrl}/img/${base64}`}  />
+        </span>
+    ) : null;
 };
 
